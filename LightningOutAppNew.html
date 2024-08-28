@@ -11,7 +11,37 @@
 
 </style>
 
-<script src="https://ddl00000bfyb9uap-dev-ed.develop.my.site.com"></script>
+<script src="https://ddl00000bfyb9uap-dev-ed.develop.my.site.com/lightning/lightning.out.js"></script>
+
+  <div data-lightning-out="true"></div>
+
+  <script>
+
+    const appName = 'c:lightningOutAppP';
+    const componentName = 'c:lightningOutApp';
+    const lightningEndpoint = 'https://ddl00000bfyb9uap-dev-ed.develop.my.site.com';
+    const targetElement = document.querySelector("[data-lightning-out]");
+    const componentAttributes = {
+
+    };
+
+    $Lightning.use(
+            appName,
+            function (){
+              $Lightning.createComponent(
+                      componentName,
+                      componentAttributes,
+                      targetElement,
+                      function (cmp){
+                        console.log('lightning component created');
+                      }
+              );
+            },
+            lightningEndpoint
+    );
+
+
+  </script>
 
 
 
