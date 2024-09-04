@@ -12,11 +12,15 @@
             padding: 20px;
             background-color: #f4f4f4;
         }
-        #status {
+        #status, #debug {
             margin-bottom: 20px;
             padding: 10px;
             background-color: #e6e6e6;
             border-radius: 5px;
+        }
+        #debug {
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         #lwcContainer {
             background-color: white;
@@ -28,38 +32,52 @@
 </head>
 <body>
     <div id="status">Initializing...</div>
+    <div id="debug"></div>
     <div id="lwcContainer"></div>
 
     <script src="https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com/lightning/lightning.out.js"></script>
     <script>
         const clientId = '3MVG9GCMQoQ6rpzT.TBg0mgSRLlXqlzWaV4F.1FRMSUe5pKIE19HEHTGmV6.oB20IevbtBWRQHgrLj9V5RZyV';
-        const redirectUri = 'https://prateekthakre.github.io/LightningOutAppTest/LightningOutAppNew.html';
+        const redirectUri = 'https://prateekthakre.github.io/LightningOutAppTest/';
         const loginUrl = 'https://login.salesforce.com/';
         const appName = 'c:lightningOutAppP';
         const componentName = 'c:lightningOutApp';
         const lightningEndpoint = 'https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com';
 
         const statusEl = document.getElementById('status');
+        const debugEl = document.getElementById('debug');
         const lwcContainerEl = document.getElementById('lwcContainer');
 
         function updateStatus(message) {
             statusEl.textContent = message;
+            console.log(message);
         }
 
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        function debug(message) {
+            debugEl.textContent += message + '\n';
+            console.log(message);
+        }
+
+        function getFragmentParam(name) {
+            const match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
+            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
         }
 
         function initiateOAuth() {
             const oauthUrl = `${loginUrl}services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+            debug(`Redirecting to: ${oauthUrl}`);
             window.location.href = oauthUrl;
         }
 
         function loadLightningComponent(accessToken) {
             updateStatus('Loading Lightning component...');
+            debug(`Access Token: ${accessToken.substr(0, 10)}...`);
+            
+            if (typeof $Lightning === 'undefined') {
+                debug('Error: $Lightning is not defined. Lightning Out script may not have loaded correctly.');
+                return;
+            }
+
             $Lightning.use(
                 appName,
                 function() {
@@ -78,12 +96,38 @@
         }
 
         // Main flow
-        const accessToken = getUrlParameter('access_token');
-        if (accessToken) {
-            updateStatus('Access token received. Initializing Lightning Out...');
-            loadLightningComponent(accessToken);
+        function handleOAuthFlow() {
+            try {
+                debug(`Current URL: ${window.location.href}`);
+                const accessToken = getFragmentParam('access_token');
+                if (accessToken) {
+                    updateStatus('Access token received. Initializing Lightning Out...');
+                    // Remove the fragment from the URL
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                    }
+                    loadLightningComponent(accessToken);
+                } else {
+                    const error = getFragmentParam('error');
+                    if (error) {
+                        updateStatus(`OAuth error: ${error}`);
+                        debug(`Error description: ${getFragmentParam('error_description')}`);
+                    } else {
+                        updateStatus('No access token found. Initiating OAuth flow...');
+                        initiateOAuth();
+                    }
+                }
+            } catch (error) {
+                updateStatus('An error occurred');
+                debug(`Error: ${error.message}`);
+            }
+        }
+
+        // Check if we're returning from OAuth
+        if (window.location.hash) {
+            handleOAuthFlow();
         } else {
-            updateStatus('No access token found. Initiating OAuth flow...');
+            // If no hash, start the OAuth flow
             initiateOAuth();
         }
     </script>
