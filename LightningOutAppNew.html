@@ -1,51 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce LWC OAuth Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #status {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e6e6e6;
+            border-radius: 5px;
+        }
+        #lwcContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="status">Initializing...</div>
+    <div id="lwcContainer"></div>
 
+    <script src="https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com/lightning/lightning.out.js"></script>
+    <script>
+        const clientId = '3MVG9GCMQoQ6rpzT.TBg0mgSRLlXqlzWaV4F.1FRMSUe5pKIE19HEHTGmV6.oB20IevbtBWRQHgrLj9V5RZyV';
+        const redirectUri = 'https://prateekthakre.github.io/LightningOutAppTest/LightningOutAppNew.html';
+        const loginUrl = 'https://login.salesforce.com/';
+        const appName = 'c:lightningOutAppP';
+        const componentName = 'c:lightningOutApp';
+        const lightningEndpoint = 'https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com';
 
+        const statusEl = document.getElementById('status');
+        const lwcContainerEl = document.getElementById('lwcContainer');
 
+        function updateStatus(message) {
+            statusEl.textContent = message;
+        }
 
-<html>
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
 
-<style>
+        function initiateOAuth() {
+            const oauthUrl = `${loginUrl}services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+            window.location.href = oauthUrl;
+        }
 
-  a {
-    color: orange;
-  }
+        function loadLightningComponent(accessToken) {
+            updateStatus('Loading Lightning component...');
+            $Lightning.use(
+                appName,
+                function() {
+                    $Lightning.createComponent(
+                        componentName,
+                        { referenceSSO: 50334602398 },
+                        lwcContainerEl,
+                        function(cmp) {
+                            updateStatus('Lightning component loaded successfully.');
+                        }
+                    );
+                },
+                lightningEndpoint,
+                accessToken
+            );
+        }
 
-</style>
-
-<script src="https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com/lightning/lightning.out.js"></script>
-
-  <div data-lightning-out="true"></div>
-
-  <script>
-
-    const appName = 'c:lightningOutAppP';
-    const componentName = 'c:lightningOutApp';
-    const lightningEndpoint = 'https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com';
-    const targetElement = document.querySelector("[data-lightning-out]");
-    const componentAttributes = {
-      referenceSSO: 50334602398,
-
-    };
-
-    $Lightning.use(
-            appName,
-            function (){
-              $Lightning.createComponent(
-                      componentName,
-                      componentAttributes,
-                      targetElement,
-                      function (cmp){
-                        console.log('lightning component created');
-                      }
-              );
-            },
-            lightningEndpoint,'00DdL00000BFYB9!AQEAQFObvjPsgvl3Ykb3eNjJrCe3hOLJmFKhnanjIqJFYhKEoJ2Jztpis7mXclPAGSS8EFGfDSpZGjKfZ7DwlC.BE1sYt2mt'
-    );
-
-
-  </script>
-
-
-
-
+        // Main flow
+        const accessToken = getUrlParameter('access_token');
+        if (accessToken) {
+            updateStatus('Access token received. Initializing Lightning Out...');
+            loadLightningComponent(accessToken);
+        } else {
+            updateStatus('No access token found. Initiating OAuth flow...');
+            initiateOAuth();
+        }
+    </script>
+</body>
 </html>
