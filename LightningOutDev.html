@@ -1,0 +1,51 @@
+
+
+
+
+<html>
+
+<style>
+
+  a {
+    color: orange;
+  }
+
+</style>
+
+<script src="https://gehealthcare-amer--dev.sandbox.lightning.force.com/lightning/lightning.out.js"></script>
+
+  <div data-lightning-out="true"></div>
+
+  <script>
+
+    const appName = 'c:lightningOutApp';
+    const componentName = 'c:lightningOutTrialDev';
+    const lightningEndpoint = 'https://gehealthcare-amer--dev.sandbox.lightning.force.com';
+    const targetElement = document.querySelector("[data-lightning-out]");
+    const componentAttributes = {
+      referenceSSO: 50334602398,
+
+    };
+
+    $Lightning.use(
+            appName,
+            function (){
+              $Lightning.createComponent(
+                      componentName,
+                      componentAttributes,
+                      targetElement,
+                      function (cmp){
+                        console.log('lightning component created');
+                      }
+              );
+            },
+            lightningEndpoint,'00DDQ0000000UHO!AQ8AQF_UuFNeNSt5j1NcKsMF5_n62z5JJ2naFztJE7Dw6g5fpWXYW7hLVlYWPgeUz2Ldafo3Q4koWFCcE66UhchAy9ROPil.'
+    );
+
+
+  </script>
+
+
+
+
+</html>
