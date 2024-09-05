@@ -1,99 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lightning Out Integration</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        a {
-            color: orange;
-        }
-        #status, #debug {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #e6e6e6;
-            border-radius: 5px;
-        }
-        #debug {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-    </style>
-</head>
-<body>
-    <div id="status">Initializing...</div>
-    <div id="debug"></div>
-    <div data-lightning-out="true"></div>
 
-    <script src="https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com/lightning/lightning.out.js"></script>
-    <script>
-        const appName = 'c:lightningOutAppP';
-        const componentName = 'c:lightningOutApp';
-        const lightningEndpoint = 'https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com';
-        const targetElement = document.querySelector("[data-lightning-out]");
-        const componentAttributes = {
-            referenceSSO: 50334602398,
-        };
 
-        const statusEl = document.getElementById('status');
-        const debugEl = document.getElementById('debug');
 
-        function updateStatus(message) {
-            statusEl.textContent = message;
-            console.log(message);
-        }
 
-        function debug(message) {
-            debugEl.textContent += message + '\n';
-            console.log(message);
-        }
+<html>
 
-        function loadLightningComponent() {
-            updateStatus('Loading Lightning component...');
-            debug(`Lightning Endpoint: ${lightningEndpoint}`);
-            debug(`App Name: ${appName}`);
-            debug(`Component Name: ${componentName}`);
+<style>
 
-            if (typeof $Lightning === 'undefined') {
-                debug('Error: $Lightning is not defined. Lightning Out script may not have loaded correctly.');
-                return;
-            }
+  a {
+    color: orange;
+  }
 
-            $Lightning.use(
-                appName,
-                function() {
-                    $Lightning.createComponent(
-                        componentName,
-                        componentAttributes,
-                        targetElement,
-                        function(cmp) {
-                            if (cmp) {
-                                updateStatus('Lightning component loaded successfully.');
-                                debug('Component created: ' + cmp.toString());
-                            } else {
-                                updateStatus('Failed to create Lightning component.');
-                                debug('Component creation failed.');
-                            }
-                        }
-                    );
-                },
-                lightningEndpoint,
-                '00DdL00000BFYB9!AQEAQP_hsLjDZnLqydfpCeRJFQ_4JKIVOlkC2s8ge5TWv7RGPsluGf6dP4PuiprwpNstjmgQka0xVrzRneuvZdODymwnH49k' // Replace with your actual access token or method to retrieve it
-            );
-        }
+</style>
 
-        // Start the process
-        document.addEventListener('DOMContentLoaded', function() {
-            updateStatus('Page loaded. Initiating Lightning Out...');
-            loadLightningComponent();
-        });
-    </script>
-</body>
+<script src="https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com/lightning/lightning.out.js"></script>
+
+  <div data-lightning-out="true"></div>
+
+  <script>
+
+    const appName = 'c:lightningOutAppP';
+    const componentName = 'c:lightningOutApp';
+    const lightningEndpoint = 'https://ddl00000bfyb9uap-dev-ed.develop.lightning.force.com';
+    const targetElement = document.querySelector("[data-lightning-out]");
+    const componentAttributes = {
+      referenceSSO: 50334602398,
+
+    };
+
+    $Lightning.use(
+            appName,
+            function (){
+              $Lightning.createComponent(
+                      componentName,
+                      componentAttributes,
+                      targetElement,
+                      function (cmp){
+                        console.log('lightning component created');
+                      }
+              );
+            },
+            lightningEndpoint,'00DdL00000BFYB9!AQEAQP_hsLjDZnLqydfpCeRJFQ_4JKIVOlkC2s8ge5TWv7RGPsluGf6dP4PuiprwpNstjmgQka0xVrzRneuvZdODymwnH49k'
+    );
+
+
+  </script>
+
+
+
+
 </html>
