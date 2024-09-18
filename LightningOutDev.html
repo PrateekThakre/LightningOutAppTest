@@ -48,10 +48,7 @@
         
         const lwcContainerEl = document.getElementById('lwcContainer');
 
-        function updateStatus(message) {
-            statusEl.textContent = message;
-            console.log(message);
-        }
+        
 
         
         function getFragmentParam(name) {
@@ -66,7 +63,7 @@
         }
 
         function loadLightningComponent(accessToken) {
-            updateStatus('Loading Lightning component...');
+            
            
             
             if (typeof $Lightning === 'undefined') {
@@ -84,7 +81,7 @@
                         },
                         lwcContainerEl,
                         function(cmp) {
-                            updateStatus('Lightning component loaded successfully.');
+                            console.log('Lightning component loaded successfully.');
                         }
                     );
                 },
@@ -99,7 +96,7 @@
                 
                 const accessToken = getFragmentParam('access_token');
                 if (accessToken) {
-                    updateStatus('Access token received. Initializing Lightning Out...');
+                    
                     // Remove the fragment from the URL
                     if (window.history && window.history.replaceState) {
                         window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
@@ -108,15 +105,15 @@
                 } else {
                     const error = getFragmentParam('error');
                     if (error) {
-                        updateStatus(`OAuth error: ${error}`);
+                       
                         
                     } else {
-                        updateStatus('No access token found. Initiating OAuth flow...');
+                       
                         initiateOAuth();
                     }
                 }
             } catch (error) {
-                updateStatus('An error occurred');
+                
                 
             }
         }
