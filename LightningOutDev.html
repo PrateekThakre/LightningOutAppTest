@@ -45,7 +45,7 @@
         const lightningEndpoint = 'https://gehealthcare-amer--dev.sandbox.lightning.force.com';
 
         const statusEl = document.getElementById('status');
-        const debugEl = document.getElementById('debug');
+        
         const lwcContainerEl = document.getElementById('lwcContainer');
 
         function updateStatus(message) {
@@ -53,11 +53,7 @@
             console.log(message);
         }
 
-        function debug(message) {
-            debugEl.textContent += message + '\n';
-            console.log(message);
-        }
-
+        
         function getFragmentParam(name) {
             const match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
             return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
@@ -65,16 +61,16 @@
 
         function initiateOAuth() {
             const oauthUrl = `${loginUrl}services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
-            debug(`Redirecting to: ${oauthUrl}`);
+            
             window.location.href = oauthUrl;
         }
 
         function loadLightningComponent(accessToken) {
             updateStatus('Loading Lightning component...');
-            debug(`Access Token: ${accessToken.substr(0, 10)}...`);
+           
             
             if (typeof $Lightning === 'undefined') {
-                debug('Error: $Lightning is not defined. Lightning Out script may not have loaded correctly.');
+                
                 return;
             }
 
@@ -100,7 +96,7 @@
         // Main flow
         function handleOAuthFlow() {
             try {
-                debug(`Current URL: ${window.location.href}`);
+                
                 const accessToken = getFragmentParam('access_token');
                 if (accessToken) {
                     updateStatus('Access token received. Initializing Lightning Out...');
@@ -113,7 +109,7 @@
                     const error = getFragmentParam('error');
                     if (error) {
                         updateStatus(`OAuth error: ${error}`);
-                        debug(`Error description: ${getFragmentParam('error_description')}`);
+                        
                     } else {
                         updateStatus('No access token found. Initiating OAuth flow...');
                         initiateOAuth();
@@ -121,7 +117,7 @@
                 }
             } catch (error) {
                 updateStatus('An error occurred');
-                debug(`Error: ${error.message}`);
+                
             }
         }
 
