@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce LWC OAuth Integration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/office-ui-fabric-core/1.4.0/css/fabric.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@salesforce-ux/design-system@latest/assets/styles/salesforce-lightning-design-system.min.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #status, #debug {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e6e6e6;
+            border-radius: 5px;
+        }
+        #debug {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #lwcContainer {
+            background-color: #03a5fc;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <div id="lwcContainer"></div>
+
+    <script src="https://gehealthcare-amer--dev.sandbox.lightning.force.com/lightning/lightning.out.js"></script>
+    <script>
+        const clientId = '3MVG9SHFu79R42RQ24eTEpPy0wpJw_HV.AU0cTeLay2tykVcCeH_T7f1FTSGkYY5cTL2_ko7OWjutBhx.CXYU';
+        const redirectUri = 'https://prateekthakre.github.io/LightningOutAppTest/LightningOutDev.html';
+        const loginUrl = 'https://test.salesforce.com/';
+        const appName = 'c:Listen_And_Lead_Application';
+        const componentName = 'c:listen_And_Lead_LWC';
+        const lightningEndpoint = 'https://gehealthcare-amer--dev.sandbox.lightning.force.com';
+
+        const statusEl = document.getElementById('status');
+        
+        const lwcContainerEl = document.getElementById('lwcContainer');
+
+        
+
+        
+        function getFragmentParam(name) {
+            const match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
+            return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+        }
+
+        function initiateOAuth() {
+            const oauthUrl = `${loginUrl}services/oauth2/authorize?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+            
+            window.location.href = oauthUrl;
+        }
+
+        function loadLightningComponent(accessToken) {
+            
+           
+            
+            if (typeof $Lightning === 'undefined') {
+                
+                return;
+            }
+
+            $Lightning.use(
+                appName,
+                function() {
+                    $Lightning.createComponent(
+                        componentName,
+                        { referenceSSO: '50334602398',
+                         countryValue: 'IN'
+                        },
+                        lwcContainerEl,
+                        function(cmp) {
+                            console.log('Lightning component loaded successfully.');
+                        }
+                    );
+                },
+                lightningEndpoint,
+                accessToken
+            );
+        }
+
+        // Main flow
+        function handleOAuthFlow() {
+            try {
+                
+                const accessToken = getFragmentParam('access_token');
+                if (accessToken) {
+                    
+                    // Remove the fragment from the URL
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                    }
+                    loadLightningComponent(accessToken);
+                } else {
+                    const error = getFragmentParam('error');
+                    if (error) {
+                       
+                        
+                    } else {
+                       
+                        initiateOAuth();
+                    }
+                }
+            } catch (error) {
+                
+                
+            }
+        }
+
+        // Check if we're returning from OAuth
+        if (window.location.hash) {
+            handleOAuthFlow();
+        } else {
+            // If no hash, start the OAuth flow
+            initiateOAuth();
+        }
+    </script>
+</body>
+</html>
